@@ -1,0 +1,13 @@
+name: Make a list
+description: Make a list
+outputs:
+  the_list:
+    description: The list desired
+    value: ${{ steps.listmaker.outputs.list }}
+runs:
+  using: composite
+  steps:
+    - name: List maker
+      id: listmaker
+      run: echo '::set-output name=list::["apple","banana"]'
+      shell: bash

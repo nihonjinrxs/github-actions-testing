@@ -1,0 +1,32 @@
+name: Do things
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  what_to_deploy:
+    runs-on: ubuntu-20.04
+    outputs:
+      apps_to_deploy: '${{ steps.listmakerstep.outputs.the_list }}'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Find affected apps
+        id: listmakerstep
+        uses: ./.github/actions/generate-list
+
+  deploy:
+    runs-on: ubuntu-20.04
+    needs:
+      - what_to_deploy
+    if: ${{ needs.what_to_deploy.outputs.apps_to_deploy != '[]' }}
+    strategy:
+      matrix:
+        project_name: ${{ fromJSON(needs.what_to_deploy.outputs.apps_to_deploy) }}
+    steps:
+      - name: What app is this?
+        run: echo "${{ matrix.project_name }}"
+        shell: bash
